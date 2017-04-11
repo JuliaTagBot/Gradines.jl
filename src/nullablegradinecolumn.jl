@@ -73,7 +73,7 @@ end
 =========================================================================================#
 function Base.getindex{T}(gc::NullableGradineColumn{T}, idx::Integer)::Nullable{T}
     if isnull(gc, idx)
-        return Nullable{T}
+        return Nullable{T}()
     end
     Nullable{T}(gc.values[idx][1])
 end
@@ -120,6 +120,12 @@ function Base.setindex!(gc::NullableGradineColumn, v::NullableVector, idx::Abstr
         gc.isnull[i_] = v.isnull[i]
         gc.values[i_] = v.values[i]
     end
+    v
+end
+
+function Base.setindex!(gc::NullableGradineColumn, v::NullableVector, ::Colon)
+    gc.isnull[:] = v.isnull
+    gc.values[:] = v.values
     v
 end
 #=========================================================================================

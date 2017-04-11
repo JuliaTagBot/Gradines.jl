@@ -6,6 +6,8 @@ using JLD
 using NullableArrays
 using DataStreams
 
+import DataTables
+
 import HDF5
 
 import Base: length, size

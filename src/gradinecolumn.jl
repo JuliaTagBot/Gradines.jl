@@ -10,7 +10,7 @@ end
 =========================================================================================#
 Base.length(gc::AbstractGradineColumn) = length(gc.values)
 Base.size(gc::AbstractGradineColumn) = size(gc.values)
-Base.eltype(gc::AbstractGradineColumn{T}) = T
+Base.eltype{T}(gc::AbstractGradineColumn{T}) = T
 
 # parent is assumed to be the same for all datasets for other types
 parent(gc::AbstractGradineColumn) = parent(gc.values)
@@ -64,7 +64,8 @@ end
 #=========================================================================================
     <setindex>
 =========================================================================================#
-setindex!(gc::GradineColumn, v, idx) = setindex!(gc.values, v, idx)
+setindex!(gc::GradineColumn, v::AbstractVector, idx) = setindex!(gc.values, v, idx)
+setindex!(gc::GradineColumn, v::Any, idx) = setindex!(gc.values, v, idx)
 #=========================================================================================
     </setindex>
 =========================================================================================#
@@ -86,6 +87,14 @@ function gradinecolumn!(grp::GrdGroup, name::Symbol, v::NullableVector)
 end
 function gradinecolumn!(f::GrdFile, group_name::String, name::Symbol, v::NullableVector)
     NullableGradineColumn!(f, group_name, name, v)
+end
+
+# the below initialize empty columns
+function gradinecolumn!{T}(grp::GrdGroup, name::Symbol, ::Type{T}, nrows::Integer)
+    GradineColumn!(grp, name, Vector{T}(nrows))
+end
+function gradinecolumn!{T}(grp::GrdGroup, name::Symbol, ::Type{Nullable{T}}, nrows::Integer)
+    NullableGradineColumn!(grp, name, NullableArray{T,1}(nrows))
 end
 
 # for loading from file
